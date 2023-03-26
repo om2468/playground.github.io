@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ChatGPT Mapmaker</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .leaflet-container {
+            height: 400px;
+            width: 600px;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="promptDiv">
+        <label for="prompt">Show a map that:</label></p>
+        <textarea id="prompt" name="prompt" rows="4" cols="50">Enter a ChatGPT prompt here.</textarea>
+        <button type="button" onclick="sendPrompt()">Get Code</button>
+    </div>
+    <div id="codeDiv">
+        <textarea id="code" name="code" rows="4" cols="50">ChatGPT-generated code will appear here.</textarea>
+        <button type="button" onclick="makeMap()">Execute Code</button>
+    </div>
+    <div id="mapDiv">
+        <div id="map" style="width: 600px; height: 400px;"></div>
+    </div>
+
+    <script id="main">
+        function makeMap() {
+            eval(String(document.getElementById('code').value)); # don't eval() in real world
+        }
+
+        function sendPrompt() {
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+                "prompt": document.getElementById("prompt").value
+            });
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
+            };
+
+            fetch("http://127.0.0.1:8000/prompt", requestOptions) # point to your API
+                .then(response => response.text())
+                .then(result => {
+                    parsedResponse = JSON.parse(result)
+                    document.getElementById("code").value = parsedResponse
+                })
+                .catch(error => console.log('error', error));
+        }
+    </script>
+</body>
+
+</html>
